@@ -64,7 +64,8 @@ function createndefuri()
 }
 
 //Function to send NFC URL/File
-function ValidateNFCUri() {			
+function ValidateNFCUri() {
+			
 			alert("Please bring second device closer to beam");
            var mes1=createndefuri();
            adapter.setBeamPushUris(mes1,context1);

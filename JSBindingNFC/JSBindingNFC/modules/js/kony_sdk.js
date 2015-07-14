@@ -62,8 +62,6 @@ kony.mbaas = kony.sdk;
 kony.sdk.isDebugEnabled = true;
 kony.sdk.isInitialized = false;
 kony.sdk.currentInstance = null;
-kony.sdk.isLicenseUrlAvailable = true;
-
 kony.sdk.version = "1.0.0.0";
 
 
@@ -377,13 +375,11 @@ kony.sdk.prototype.initWithServiceDoc = function(appKey, appSecret, serviceDoc) 
 			if (typeof(servConfig.sync) !== 'undefined') {
 				konyRef.sync = servConfig.sync;
 			}
-			if(kony.sdk.isLicenseUrlAvailable) {
-				if (servConfig.reportingsvc && servConfig.reportingsvc.custom && servConfig.reportingsvc.session) {
-					konyRef.customReportingURL = servConfig.reportingsvc.custom;
-					konyRef.sessionReportingURL = servConfig.reportingsvc.session;
-				} else {
-					throw new Exception(Errors.INIT_FAILURE, "invalid url for reporting service");
-				}
+			if (servConfig.reportingsvc && servConfig.reportingsvc.custom && servConfig.reportingsvc.session) {
+				konyRef.customReportingURL = servConfig.reportingsvc.custom;
+				konyRef.sessionReportingURL = servConfig.reportingsvc.session;
+			} else {
+				throw new Exception(Errors.INIT_FAILURE, "invalid url for reporting service");
 			}
 
 			if (konyRef.internalSdkObject) {
@@ -1943,9 +1939,6 @@ kony.sdk.prototype.getMetricsService = function() {
 	if (!kony.sdk.isInitialized) {
 		throw new Exception(Errors.INIT_FAILURE, "Please call init before invoking this service");
 	}
-	if(!kony.sdk.isLicenseUrlAvailable) {
-		throw new Exception(Errors.METRICS_FAILURE, "metrics is not enabled");
-	}
 
 	//var metricsServiceObject = null;
 	if (this.metricsServiceObject) {
@@ -2001,17 +1994,11 @@ function MetricsService(konyRef) {
 	var eventBufferCount = 0;
 	var eventTypeMap = {
 		"formentry": "FormEntry",
-		"formexit": "FormExit",
 		"touch": "Touch",
-		"servicerequest": "ServiceRequest",
-		"serviceresponse": "ServiceResponse",
+		"servicecall": "ServiceCall",
 		"gesture": "Gesture",
 		"orientation": "Orientation",
-		"error": "Error",
-		"exception": "Exception",
-		"crash": "Crash",
-		"custom": "Custom",
-		"servicecall": "ServiceCall"
+		"custom": "Custom"
 	};
 	var errorCodeMap = {
 		"1000": true,
@@ -2797,15 +2784,13 @@ kony.setupsdks = function(initConfig, successCallBack, errorCallBack) {
     } else {
       newUrl = url;
     }
-    return newUrl + path;
+    return newUrl;
   };
 
   var konyAPMSuccessCallBack = function(metricsObject, initConfig) {
     kony.print("Initializing event tracking");
     KNYMetricsService = metricsObject;
-    if(KNYMetricsService) {
-      KNYMetricsService.setEventTracking(initConfig.eventTypes);
-    }
+    KNYMetricsService.setEventTracking(initConfig.eventTypes);
 
   };
 
@@ -2829,13 +2814,7 @@ kony.setupsdks = function(initConfig, successCallBack, errorCallBack) {
     if (KNYMobileFabric == null) {
       initKNYMobileFabric(initConfig);
     }
-    if (initConfig && initConfig.appConfig && (getLicenseUrl(initConfig.appConfig) === "")) {
-        if(kony.license && kony.license.setIsLicenseUrlAvailable) {
-          kony.license.setIsLicenseUrlAvailable(false);
-          kony.sdk.isLicenseUrlAvailable = false;
-        }
-    }
-    if (kony.sdk.isLicenseUrlAvailable && kony.license.checkAndCreateSession) {
+    if (kony.license.checkAndCreateSession) {
       kony.license.checkAndCreateSession();
     }
     if (isServiceDocPresentInAppConfig(initConfig)) {
@@ -2861,15 +2840,12 @@ kony.setupsdks = function(initConfig, successCallBack, errorCallBack) {
   var initWithServiceDocHelper = function(serviceDoc, successcallback, failurecallback) {
     try {
       KNYMobileFabric.initWithServiceDoc(null, null, serviceDoc);
-      var MetricsService = null;
-      if (kony.sdk.isLicenseUrlAvailable) {
-        MetricsService = KNYMobileFabric.getMetricsService();
-        if (kony.license.registerChangeListener) {
-          kony.license.registerChangeListener(KNYMobileFabric.sessionChangeHandler);
-        }
+      var MetricsService = KNYMobileFabric.getMetricsService();
+      if (kony.license.registerChangeListener) {
+        kony.license.registerChangeListener(KNYMobileFabric.sessionChangeHandler);
       }
       if (successcallback)
-          successcallback(MetricsService, initConfig);
+        successcallback(MetricsService, initConfig);
     } catch (error) {
       if (failurecallback)
         failurecallback(error);
@@ -3247,7 +3223,7 @@ function konyXMLHttpRequest(url, params, headers, successCallback, errorCallback
 		httpRequest.timeout = params.httpconfig.timeout * 1000;
 
 	}
-	if (headers["Content-Type"] === "application/x-www-form-urlencoded" || headers["Content-Type"] === "application/json") {
+	if (headers["Content-Type"] === "application/x-www-form-urlencoded") {
 		var paramsTable = "";
 		var firstVal = true;
 		for (var key in params) {
@@ -3256,14 +3232,7 @@ function konyXMLHttpRequest(url, params, headers, successCallback, errorCallback
 			}
 			firstVal = false;
 			if (params[key]) {
-				if(typeof(params[key]) === "object")
-				{
-                    paramsTable = paramsTable + key + "=" + encodeURIComponent(JSON.stringify(params[key]));
-				}
-				else
-				{
-					paramsTable = paramsTable + key + "=" + encodeURIComponent(params[key]);
-				}
+				paramsTable = paramsTable + key + "=" + encodeURIComponent(params[key]);
 			}
 		}
 		params = paramsTable;

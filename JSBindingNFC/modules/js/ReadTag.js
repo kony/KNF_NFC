@@ -32,7 +32,8 @@ function OnCreated() {
     var intentfilter=[];
     intentfilter[0]=ndefIntent;
     var intentfilters=java.newArray('android.content.IntentFilter',intentfilter );
-	var activityLifeCycleListener = new MyActivityLifeCycleListener();
+	
+    var activityLifeCycleListener = new MyActivityLifeCycleListener();
     KonyMain.addActivityLifeCycleListener(activityLifeCycleListener);
     
     // Pending Intent
@@ -43,7 +44,7 @@ function OnCreated() {
 	alert("Please bring the NFC tag closer to read");
 	
 	
-   	}
+   }
 var MyActivityLifeCycleListener = java.newClass('MyActivityLifeCycleListener', 'com.konylabs.ffi.KonyActivityLifeCycleListener',[] , {
    
     onNewIntent : function(Intent) {
