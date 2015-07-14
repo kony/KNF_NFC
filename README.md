@@ -4,6 +4,7 @@ This application will showcase KonyJSBindings feature in a way that user can use
   - Beaming Text via NFC.
   - Beaming Files via NFC.
   - Reading NFC tags.
+
 #To run this app
 
 - Import the project KonyJSBindings_NFC Zip file
