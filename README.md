@@ -7,11 +7,14 @@ This application will showcase the Kony native function api feature in a way tha
 
 #To run this app
 
-- Import the project.
-- Go to Application Properties -> Native -> Android
-- Enable Mobile First API's
-- To test "Broadcast NFC URL" change the hardcoded file location to a file location available on the device.  This need to be changed in the function createndefuri() present in NFCTextandURL.js 
-- Build and run the application
+1. Download the project zip file.
+2. Unzip the project to any folder
+3. Launch Kony Visualizer Enterprise version 7.0.
+4. Import the project by selecting the JSBindingNFC folder.
+5. Go to Application Properties -> Native -> Android
+6. Enable Mobile First API's
+7. To test "Broadcast NFC URL" change the hardcoded file location to a file location available on the device.  This need to be changed in the function createndefuri() present in NFCTextandURL.js 
+8. Build and run the application
 
 # Supported platforms:
 **Mobile**
